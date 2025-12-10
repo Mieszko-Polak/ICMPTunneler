@@ -1,12 +1,18 @@
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
+namespace ICMPTunneler.Examples;
 public class IcmpSocketTest
 {
-    public async Task SendIcmpTest(IPAddress server)
+    public static async Task SendIcmpTest(IPAddress server)
     {
         using Socket sender = new(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.Icmp);
-        //string message = "Testing";
-        //sender.Connect(IPAddress.Parse("127.0.0.1").Serialize);
+        sender.DontFragment = false;
+        string message = "T";
+        byte[] messageBytes = Encoding.ASCII.GetBytes (message);
+        sender.Connect(server, 0);
+        sender.Send(messageBytes);
+        Console.WriteLine($"Outside sent {message} as ICMP packet");
     }
 }
