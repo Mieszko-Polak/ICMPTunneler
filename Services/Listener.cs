@@ -16,6 +16,7 @@ public class Listener
     {
         void Device_OnPacketArrival(object s, PacketCapture e)
         {
+            //Console.WriteLine("Recieved something");
             var rawPacket = e.GetPacket();
             if(MessageParser.GetFlag(rawPacket).Item1 == "SYN" && !currentlyCommunicating)
             {
@@ -33,7 +34,7 @@ public class Listener
                 string fragmentMessage = messageInfo.Item2;
                 if(fragmentNumber >= 0)
                 {
-                    Console.WriteLine("Recieved something");
+                    //Console.WriteLine("Recieved something");
                     Console.WriteLine(fragmentNumber);
                     fragments[fragmentNumber] = fragmentMessage;
                     Pinger.SendPing(communicatingIP, ">~|ACK"+StringPadder.PadToTwoDigits(fragmentNumber.ToString())+"|~<");
@@ -48,7 +49,7 @@ public class Listener
             }
         }
 
-        var device = CaptureDeviceList.Instance[7];
+        var device = CaptureDeviceList.Instance[1];
         Console.WriteLine(device);
         device.Open();
         device.OnPacketArrival += Device_OnPacketArrival;

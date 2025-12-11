@@ -3,11 +3,12 @@ using System.Text;
 using ICMPTunneler.Utils;
 using PacketDotNet;
 using SharpPcap;
+using System.Threading.Tasks;
 
 namespace ICMPTunneler.Services;
 
 public class Sender
-{}
+{
     public static async Task SendMessage(string destination, string message)
     {
         MessageParser parser = new();
@@ -15,40 +16,27 @@ public class Sender
 
         await Pinger.SendPing(destination, ">~|SYN" + StringPadder.PadToTwoDigits(fragments.Length.ToString()) + "|~<");
 
-        ListenForAckToSyn();
+        await ErrorCatcher.CatchErrors(new List<int> {-1}, 100000);
 
-        Console.WriteLine("Got Here");
-        foreach (string fragment in fragments)
+        List<int> fragmentsToSend = Enumerable.Range(0, fragments.Length).ToList();
+        int sendTries = 0;
+        while(sendTries < 5 && fragmentsToSend.Count != 0)
         {
-            Console.WriteLine(fragment);
-            Pinger.SendPing(destination, fragment);
-        }
-
-        CatchErrors(fragments);
-    }
-
-    private static void ListenForAckToSyn()
-    {
-        var device = CaptureDeviceList.Instance[7];
-
-        void Device_OnPacketArrival(object s, PacketCapture e)
-        {
-            var rawPacket = e.GetPacket();
-            if (MessageParser.GetFlag(rawPacket).Item1 == "ACK" && MessageParser.GetFlag(rawPacket).Item2 == -1)
+            foreach (int fragmentNum in fragmentsToSend)
             {
-                device.StopCapture();
+                Pinger.SendPing(destination, fragments[fragmentNum], 4);
+            }
+            fragmentsToSend = await ErrorCatcher.CatchErrors(fragmentsToSend, 1000);
+            Console.WriteLine(fragmentsToSend.Count);
+            sendTries++;
+        }
+        if (fragmentsToSend.Count != 0)
+        {
+            Console.Write("These fragments were not sent: ");
+            foreach (int fragmentNum in fragmentsToSend)
+            {
+                Console.WriteLine(fragments[fragmentNum].ToString());
             }
         }
-
-        
-        Console.WriteLine(device);
-        device.Open();
-        device.OnPacketArrival += Device_OnPacketArrival;
-        device.StartCapture();
-    }
-
-    private static void CatchErrors(string[] fragments)
-    {
-        
     }
 }

@@ -6,7 +6,7 @@ using ICMPTunneler.Utils;
 
 //await PingTest.SendPing();
 //await IcmpSocketTest.SendIcmpTest(IPAddress.Parse("192.168.1.76"));
-//SharppcapTest.ListDevices();
+SharppcapTest.ListDevices();
 //await SharppcapTest.Listen();
 
 
@@ -19,7 +19,7 @@ if (choice == "L")
 }
 else
 {
-    await Sender.SendMessage("192.168.1.76","Ok so this is going to have to be at least 52 characters, I wonder if it will work when I type an essay in this box. There is a max of 5200 characters I think, so I could pu tmy personal statement in here, and it owuld be fine. Maybe I'll make a file it can read from , and it can go from there?");
+    await Sender.SendMessage("127.0.0.1","Ok so this is going to have to be at least 52 characters, I wonder if it will work when I type an essay in this box. There is a max of 5200 characters I think, so I could pu tmy personal statement in here, and it owuld be fine. Maybe I'll make a file it can read from , and it can go from there?");
 }
 
 /*
