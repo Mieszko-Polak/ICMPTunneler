@@ -35,8 +35,10 @@ public class Listener
                 if(fragmentNumber >= 0)
                 {
                     //Console.WriteLine("Recieved something");
-                    Console.WriteLine(fragmentNumber);
+                    //Console.WriteLine(fragmentNumber);
                     fragments[fragmentNumber] = fragmentMessage;
+                    //Console.WriteLine(">~|ACK"+StringPadder.PadToTwoDigits(fragmentNumber.ToString())+"|~<");
+                    //Console.WriteLine(communicatingIP);
                     Pinger.SendPing(communicatingIP, ">~|ACK"+StringPadder.PadToTwoDigits(fragmentNumber.ToString())+"|~<");
                 }
                 if (!fragments.Any(string.IsNullOrEmpty))
@@ -49,8 +51,8 @@ public class Listener
             }
         }
 
-        var device = CaptureDeviceList.Instance[1];
-        Console.WriteLine(device);
+        var device = CaptureDeviceList.Instance[7];
+        //Console.WriteLine(device);
         device.Open();
         device.OnPacketArrival += Device_OnPacketArrival;
         device.Capture();

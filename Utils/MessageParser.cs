@@ -84,6 +84,8 @@ class MessageParser()
                 {
                     if (data[messageStart..(messageStart + 6)] == ">~|ACK")
                     {
+                        //Console.WriteLine("Found ACK");
+                        //Console.WriteLine(data[(messageStart + 6)..messageEnd]);
                         return ("ACK", Int32.Parse(data[(messageStart + 6)..messageEnd]));
                     }
                 }

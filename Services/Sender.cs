@@ -15,6 +15,7 @@ public class Sender
         string[] fragments = parser.Encode(message);
 
         await Pinger.SendPing(destination, ">~|SYN" + StringPadder.PadToTwoDigits(fragments.Length.ToString()) + "|~<");
+        //Console.WriteLine(">~|SYN" + StringPadder.PadToTwoDigits(fragments.Length.ToString()) + "|~<");
 
         await ErrorCatcher.CatchErrors(new List<int> {-1}, 100000);
 
@@ -24,10 +25,12 @@ public class Sender
         {
             foreach (int fragmentNum in fragmentsToSend)
             {
-                Pinger.SendPing(destination, fragments[fragmentNum], 4);
+                Pinger.SendPing(destination, fragments[fragmentNum], 0);
+                //Console.WriteLine(fragmentNum);
             }
-            fragmentsToSend = await ErrorCatcher.CatchErrors(fragmentsToSend, 1000);
-            Console.WriteLine(fragmentsToSend.Count);
+            fragmentsToSend = await ErrorCatcher.CatchErrors(fragmentsToSend, 10000);
+            //Console.WriteLine(String.Join(", ", fragmentsToSend));
+            //Console.WriteLine(fragmentsToSend.Count);
             sendTries++;
         }
         if (fragmentsToSend.Count != 0)
@@ -37,6 +40,10 @@ public class Sender
             {
                 Console.WriteLine(fragments[fragmentNum].ToString());
             }
+        }
+        else
+        {
+            Console.WriteLine("Message Delivered Successfully");
         }
     }
 }
