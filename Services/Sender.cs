@@ -12,7 +12,7 @@ public class Sender
     {
         MessageParser parser = new();
         string[] fragments = parser.Encode(message);
-        await Pinger.SendPing(destination, ">H" + fragments.Length.ToString() + "<");
+        await Pinger.SendPing(destination, ">~|H" + fragments.Length.ToString() + "|~<");
 
         ListenForAck();
 
