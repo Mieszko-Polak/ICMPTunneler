@@ -10,8 +10,8 @@ namespace ICMPTunneler.Utils;
 class MessageParser()
 {
 
-    private readonly int maxMessageLength = 5200;
-    private readonly int fragmentSize = 52;
+    private readonly int maxMessageLength = 4800;
+    private readonly int fragmentSize = 48;
     public string[] Encode(string message)
     {
         if (message.Length > this.maxMessageLength)
@@ -31,14 +31,14 @@ class MessageParser()
             {
                 fragmentNum = "0" + fragmentNum;
             } 
-            fragments[i] = ">" + fragmentNum + fragments[i] + "<";
+            fragments[i] = ">~|" + fragmentNum + fragments[i] + "|~<";
         }
         return fragments;
     }
 
     public string Decode(string[] fragments)
     {
-        fragments = fragments.Select(x => x[3..(x.Length-1)]).ToArray();
+        fragments = fragments.Select(x => x[5..(x.Length-3)]).ToArray();
         return String.Join("",fragments);
     }
 
@@ -49,25 +49,25 @@ class MessageParser()
         string data = Encoding.ASCII.GetString(rawPacket.Data);
         if (data.Contains('>'))
         {
-            int messageStart = data.IndexOf(">");
-            if (data.Contains('<'))
+            int messageStart = data.IndexOf(">~|");
+            if (data.Contains(">~|"))
             {
-                int messageEnd = data.IndexOf("<");
-                if(messageStart < data.Length - 3)
+                int messageEnd = data.IndexOf("|~<");
+                if(messageStart < data.Length - 7)
                 {
                     try
                     {
-                        fragmentNumber = Int32.Parse(data[(messageStart + 1)..(messageStart + 3)]);
-                        return (fragmentNumber, data[(messageStart + 3)..messageEnd]);
+                        fragmentNumber = Int32.Parse(data[(messageStart + 3)..(messageStart + 5)]);
+                        return (fragmentNumber, data[(messageStart + 5)..messageEnd]);
 
                     } catch (FormatException)
                     {
-                        if(data[messageStart+1] == 'H')
+                        if(data[messageStart+3] == 'H')
                         {
                             var packet = PacketDotNet.Packet.ParsePacket(rawPacket.LinkLayerType, rawPacket.Data);
                             var ip = packet.Extract<PacketDotNet.IPPacket>();
                             var sourceAddress = ip.SourceAddress;
-                            return (-1, sourceAddress.ToString() + "@" + data[(messageStart + 2)..messageEnd]);
+                            return (-1, sourceAddress.ToString() + "@" + data[(messageStart + 4)..messageEnd]);
                         }
                         return (-2, "");
                     }
@@ -81,12 +81,12 @@ class MessageParser()
     public static bool IsAck(RawCapture rawPacket)
     {
         string data = Encoding.ASCII.GetString(rawPacket.Data);
-        if (data.Contains('>'))
+        if (data.Contains(">~|"))
         {
-            int messageStart = data.IndexOf(">");
-            if (messageStart < data.Length - 6)
+            int messageStart = data.IndexOf(">~|");
+            if (messageStart < data.Length - 8)
             {
-                if (data[messageStart..(messageStart + 7)] == ">|ACK|<")
+                if (data[messageStart..(messageStart + 9)] == ">~|ACK|~<")
                 {
                     return true;
                 }
