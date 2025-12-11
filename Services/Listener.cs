@@ -36,6 +36,7 @@ public class Listener
                     Console.WriteLine("Recieved something");
                     Console.WriteLine(fragmentNumber);
                     fragments[fragmentNumber] = fragmentMessage;
+                    Pinger.SendPing(communicatingIP, ">~|ACK"+StringPadder.PadToTwoDigits(fragmentNumber.ToString())+"|~<");
                 }
                 if (!fragments.Any(string.IsNullOrEmpty))
                 {

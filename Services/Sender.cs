@@ -7,19 +7,13 @@ using SharpPcap;
 namespace ICMPTunneler.Services;
 
 public class Sender
-{
+{}
     public static async Task SendMessage(string destination, string message)
     {
         MessageParser parser = new();
         string[] fragments = parser.Encode(message);
 
-        string messageLength = fragments.Length.ToString();
-        if (messageLength.Length < 2)
-        {
-            messageLength = "0" + messageLength;
-        }
-
-        await Pinger.SendPing(destination, ">~|SYN" + messageLength + "|~<");
+        await Pinger.SendPing(destination, ">~|SYN" + StringPadder.PadToTwoDigits(fragments.Length.ToString()) + "|~<");
 
         ListenForAckToSyn();
 
@@ -27,8 +21,10 @@ public class Sender
         foreach (string fragment in fragments)
         {
             Console.WriteLine(fragment);
-            await Pinger.SendPing(destination, fragment);
+            Pinger.SendPing(destination, fragment);
         }
+
+        CatchErrors(fragments);
     }
 
     private static void ListenForAckToSyn()
@@ -49,5 +45,10 @@ public class Sender
         device.Open();
         device.OnPacketArrival += Device_OnPacketArrival;
         device.StartCapture();
+    }
+
+    private static void CatchErrors(string[] fragments)
+    {
+        
     }
 }
