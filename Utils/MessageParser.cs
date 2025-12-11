@@ -62,13 +62,6 @@ class MessageParser()
 
                     } catch (FormatException)
                     {
-                        if(data[messageStart+3] == 'H')
-                        {
-                            var packet = PacketDotNet.Packet.ParsePacket(rawPacket.LinkLayerType, rawPacket.Data);
-                            var ip = packet.Extract<PacketDotNet.IPPacket>();
-                            var sourceAddress = ip.SourceAddress;
-                            return (-1, sourceAddress.ToString() + "@" + data[(messageStart + 4)..messageEnd]);
-                        }
                         return (-2, "");
                     }
                 }
@@ -78,21 +71,37 @@ class MessageParser()
         return (-2, "");
     }
 
-    public static bool IsAck(RawCapture rawPacket)
+    public static (string,int) GetFlag(RawCapture rawPacket)
     {
         string data = Encoding.ASCII.GetString(rawPacket.Data);
         if (data.Contains(">~|"))
         {
             int messageStart = data.IndexOf(">~|");
-            if (messageStart < data.Length - 8)
+            if (data.Contains("|~<"))
             {
-                if (data[messageStart..(messageStart + 9)] == ">~|ACK|~<")
+                int messageEnd = data.IndexOf("|~<");
+                if (messageStart < data.Length - 8)
                 {
-                    return true;
+                    if (data[messageStart..(messageStart + 6)] == ">~|ACK")
+                    {
+                        return ("ACK", Int32.Parse(data[(messageStart + 6)..messageEnd]));
+                    }
+                }
+                {
+                    if (data[messageStart..(messageStart + 6)] == ">~|FIN")
+                    {
+                        return ("FIN", Int32.Parse(data[(messageStart + 6)..messageEnd]));
+                    }
+                }
+                {
+                    if (data[messageStart..(messageStart + 6)] == ">~|SYN")
+                    {
+                        return ("SYN", Int32.Parse(data[(messageStart + 6)..messageEnd]));
+                    }
                 }
             }
         }
-        return false;
+        return ("",-2);
     }
 }
 

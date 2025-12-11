@@ -12,9 +12,16 @@ public class Sender
     {
         MessageParser parser = new();
         string[] fragments = parser.Encode(message);
-        await Pinger.SendPing(destination, ">~|H" + fragments.Length.ToString() + "|~<");
 
-        ListenForAck();
+        string messageLength = fragments.Length.ToString();
+        if (messageLength.Length < 2)
+        {
+            messageLength = "0" + messageLength;
+        }
+
+        await Pinger.SendPing(destination, ">~|SYN" + messageLength + "|~<");
+
+        ListenForAckToSyn();
 
         Console.WriteLine("Got Here");
         foreach (string fragment in fragments)
@@ -24,14 +31,14 @@ public class Sender
         }
     }
 
-    private static void ListenForAck()
+    private static void ListenForAckToSyn()
     {
         var device = CaptureDeviceList.Instance[7];
 
         void Device_OnPacketArrival(object s, PacketCapture e)
         {
             var rawPacket = e.GetPacket();
-            if (MessageParser.IsAck(rawPacket))
+            if (MessageParser.GetFlag(rawPacket).Item1 == "ACK" && MessageParser.GetFlag(rawPacket).Item2 == -1)
             {
                 device.StopCapture();
             }
