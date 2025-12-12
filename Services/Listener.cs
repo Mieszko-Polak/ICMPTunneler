@@ -51,7 +51,8 @@ public class Listener
             }
         }
 
-        var device = CaptureDeviceList.Instance[7];
+        var device = CaptureDeviceList.Instance[3];
+        //Console.WriteLine(device);
         //Console.WriteLine(device);
         device.Open();
         device.OnPacketArrival += Device_OnPacketArrival;

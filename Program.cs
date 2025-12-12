@@ -9,7 +9,7 @@ using ICMPTunneler.Utils;
 
 //await SharppcapTest.Listen();
 
-string destinationIp = "127.0.0.1";
+string destinationIp = "192.168.0.22";
 Console.Write("Listen (L), Send (S) or view available capture devices (D)");
 var choice = Console.ReadLine();
 if (choice == "L")

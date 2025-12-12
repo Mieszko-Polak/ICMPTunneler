@@ -11,7 +11,7 @@ public class ErrorCatcher
         var tcs = new TaskCompletionSource();
         var timeoutTask = Task.Delay(timeout);
         //Console.WriteLine(sequenceNumbersToBeAcked[0]);
-        var device = CaptureDeviceList.Instance[7];
+        var device = CaptureDeviceList.Instance[3];
         void Device_OnPacketArrival(object s, PacketCapture e)
         {
             //Console.WriteLine("GotHer");
