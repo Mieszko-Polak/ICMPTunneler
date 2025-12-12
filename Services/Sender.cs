@@ -16,7 +16,6 @@ public class Sender
         string[] fragments = parser.Encode(username + ": " + message);
 
         await Pinger.SendPing(destination, ">~|SYN" + StringPadder.PadToTwoDigits(fragments.Length.ToString()) + "|~<");
-        //Console.WriteLine(">~|SYN" + StringPadder.PadToTwoDigits(fragments.Length.ToString()) + "|~<");
 
         await ErrorCatcher.CatchErrors(new List<int> {-1}, 2000);
 
@@ -27,11 +26,8 @@ public class Sender
             foreach (int fragmentNum in fragmentsToSend)
             {
                 Pinger.SendPing(destination, fragments[fragmentNum], 4);
-                //Console.WriteLine(fragmentNum);
             }
             fragmentsToSend = await ErrorCatcher.CatchErrors(fragmentsToSend, 2000);
-            //Console.WriteLine(String.Join(", ", fragmentsToSend));
-            //Console.WriteLine(fragmentsToSend.Count);
             sendTries++;
         }
         if (fragmentsToSend.Count != 0)
@@ -44,7 +40,7 @@ public class Sender
         }
         else
         {
-            Console.WriteLine("Message Delivered Successfully");
+            Console.WriteLine("A chunk of the message was successfully delivered");
         }
     }
 }

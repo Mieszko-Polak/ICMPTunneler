@@ -17,7 +17,6 @@ public class Pinger
         byte[] messageBytes = Encoding.ASCII.GetBytes(message);
         int timeout = 128;
         PingReply reply = sender.Send(IPAddress.Parse(destination), timeout,messageBytes);
-        //Console.WriteLine(reply);
     } else
     {
         Console.WriteLine("Packet with message " + message + " got disrupted");
