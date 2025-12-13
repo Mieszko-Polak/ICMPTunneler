@@ -27,7 +27,7 @@ else if (choice == "S")
         foreach (char[] chunk in chunks)
         {
             await Sender.SendMessage(destinationIp, new string(chunk));
-            await Task.Delay(1000);
+            await Task.Delay(1000); //Let the pings and acknoledgment from previous chunk die out, before sending the next one.
         }
     }
 } 
