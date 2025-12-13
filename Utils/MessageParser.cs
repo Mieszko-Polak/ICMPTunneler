@@ -12,6 +12,7 @@ class MessageParser()
 
     private readonly int maxMessageLength = 4800;
     private readonly int fragmentSize = 48;
+    //Catch strings which are too long, or have triangle brackets, otherwise, split into appropriately sized fragments.
     public string[] Encode(string message)
     {
         if (message.Length > this.maxMessageLength)
@@ -36,6 +37,7 @@ class MessageParser()
         return fragments;
     }
 
+    //Join fragemnts into a string, and cut out ">~|xx" and "|~<" from the string
     public string Decode(string[] fragments)
     {
         fragments = fragments.Select(x => x[5..(x.Length-3)]).ToArray();
@@ -47,6 +49,7 @@ class MessageParser()
         int fragmentNumber = -2;
         //var packet = PacketDotNet.Packet.ParsePacket(rawPacket.LinkLayerType, rawPacket.Data);
         string data = Encoding.ASCII.GetString(rawPacket.Data);
+        //Test if the data is correctly formatted, and try to retrieve a fragment number and message fragement if it is
         if (data.Contains('>'))
         {
             int messageStart = data.IndexOf(">~|");
@@ -71,6 +74,7 @@ class MessageParser()
         return (-2, "");
     }
 
+    //Test if a packet is formatted to be a flag, and extract the flag and attached number
     public static (string,int) GetFlag(RawCapture rawPacket)
     {
         string data = Encoding.ASCII.GetString(rawPacket.Data);
